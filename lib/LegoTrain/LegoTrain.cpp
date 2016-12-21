@@ -24,9 +24,9 @@ void LegoTrain::sendState()
 
 void LegoTrain::update()
 {
-  unsigned long currentMillis = millis();
-  if (currentMillis < _nextUpdateMillis) { return; }
-
+  uint32_t currentMillis = millis();
+  if ((int16_t)(currentMillis - _nextUpdateMillis) < 0) { return; }
+  
   switch(_state) {
     case ACCELLERATING:
       if (_currentSpeed >= MAX_SPEED) {

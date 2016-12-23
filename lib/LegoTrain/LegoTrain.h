@@ -2,11 +2,13 @@
 #define LegoTrain_h
 
 #include <stdio.h>
+#include <stdlib.h>
+
 #include "Arduino.h"
 #include "PowerFunctions.h"
 
 enum trainStates {
-  ACCELLERATING,
+  ACCELERATING,
   RUNNING,
   BREAKING,
   STOPPED
@@ -19,6 +21,7 @@ class LegoTrain
     void update();
   private:
     void sendState();
+    uint8_t _speeds [4] = {0x0, 0xF, 0xE, 0xD};
     PowerFunctions _train;
     enum trainStates _state;
     uint8_t _sensorPin;

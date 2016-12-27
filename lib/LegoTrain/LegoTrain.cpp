@@ -2,13 +2,12 @@
 #include "LegoTrain.h"
 
 
-#define MAX_SPEED 1
+#define MAX_SPEED 3
 #define STOP 0
-#define ACCELLERATION 1300
+#define ACCELLERATION 500
 #define STOP_TIME 300 // Stay on station for 5 minutes
 
-LegoTrain::LegoTrain(const PowerFunctions& train, uint8_t sensorPin) : _train(train)
-{
+LegoTrain::LegoTrain(const PowerFunctions& train, uint8_t sensorPin) : _train(train) {
   _train = train;
   _nextUpdateMillis = 0;
   _state = ACCELERATING;
@@ -17,13 +16,11 @@ LegoTrain::LegoTrain(const PowerFunctions& train, uint8_t sensorPin) : _train(tr
   pinMode(_sensorPin, INPUT);
 }
 
-void LegoTrain::sendState()
-{
+void LegoTrain::sendState() {
   _train.single_pwm(BLUE, _speeds[_currentSpeed]);
 }
 
-void LegoTrain::update()
-{
+void LegoTrain::update() {
   uint32_t currentMillis = millis();
   if ((int32_t)(currentMillis - _nextUpdateMillis) < 0) { return; }
 
@@ -31,7 +28,7 @@ void LegoTrain::update()
     case ACCELERATING:
       if (_currentSpeed == MAX_SPEED) {
         _state = RUNNING;
-        _nextUpdateMillis = 0;
+        _nextUpdateMillis = currentMillis + 5000;
         break;
       }
       _currentSpeed++;

@@ -5,7 +5,6 @@
 #include <stdlib.h>
 
 #include "Arduino.h"
-#include "PowerFunctions.h"
 
 enum trainStates {
   ACCELERATING,
@@ -17,15 +16,17 @@ enum trainStates {
 class LegoTrain
 {
 	public:
-    LegoTrain(const PowerFunctions&, uint8_t);
+    LegoTrain(uint8_t, uint8_t, uint8_t, uint8_t);
     void update();
+    void enabled(bool);
   private:
-    void sendState();
-    uint8_t _speeds [4] = {0x0, 0xF, 0xE, 0xD};
-    PowerFunctions _train;
     enum trainStates _state;
+    uint8_t _throttlePin;
+    uint8_t _directionPin;
+    uint8_t _enabledPin;
     uint8_t _sensorPin;
     uint32_t _nextUpdateMillis;
+
     uint8_t _currentSpeed;
 };
 

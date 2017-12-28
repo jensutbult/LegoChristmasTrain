@@ -2,22 +2,24 @@
 #include "LegoTrain.h"
 
 
-#define MAX_SPEED 3
+#define MAX_SPEED 200
 #define STOP 0
-#define ACCELLERATION 500
-#define STOP_TIME 300 // Stay on station for 5 minutes
+#define ACCELLERATION 30
+#define STOP_TIME 60 // Stay on station for 1 minute
 
-LegoTrain::LegoTrain(const PowerFunctions& train, uint8_t sensorPin) : _train(train) {
-  _train = train;
+LegoTrain::LegoTrain(uint8_t throttlePin, uint8_t directionPin, uint8_t enabledPin, uint8_t sensorPin) {
   _nextUpdateMillis = 0;
   _state = ACCELERATING;
   _currentSpeed = STOP;
+  _throttlePin = throttlePin;
+  _directionPin = directionPin;
+  _enabledPin = enabledPin;
   _sensorPin = sensorPin;
   pinMode(_sensorPin, INPUT);
 }
 
-void LegoTrain::sendState() {
-  _train.single_pwm(BLUE, _speeds[_currentSpeed]);
+void LegoTrain::enabled(bool enabled) {
+  digitalWrite(_enabledPin, enabled);
 }
 
 void LegoTrain::update() {
@@ -28,18 +30,15 @@ void LegoTrain::update() {
     case ACCELERATING:
       if (_currentSpeed == MAX_SPEED) {
         _state = RUNNING;
-        _nextUpdateMillis = currentMillis + 5000;
         break;
       }
       _currentSpeed++;
-      sendState();
+      analogWrite(_throttlePin, _currentSpeed);
       _nextUpdateMillis = currentMillis + ACCELLERATION;
       break;
     case RUNNING:
-      _nextUpdateMillis = 0;
-      if (digitalRead(_sensorPin) == HIGH) {
+      if (analogRead(_sensorPin) < 20) {
         _state = BREAKING;
-        break;
       }
       break;
     case BREAKING:
@@ -49,12 +48,11 @@ void LegoTrain::update() {
         break;
       }
       _currentSpeed--;
-      sendState();
+      analogWrite(_throttlePin, _currentSpeed);
       _nextUpdateMillis = currentMillis + ACCELLERATION;
       break;
     case STOPPED:
       _state = ACCELERATING;
-      _nextUpdateMillis = 0;
       break;
   }
 }
